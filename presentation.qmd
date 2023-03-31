@@ -110,19 +110,7 @@ Products include:
 
 <br>
 
--   Raw data
-
--   Processed data
-
--   Model inputs
-
--   Code
-
--   Summary reports
-
--   Figures and tables
-
--   Github repository
+![](imgs/process_diagram.PNG)
 
 ## Step 01: Retrieve raw data {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
 
@@ -296,6 +284,8 @@ DeleteForecastFiles <- T #Remove extra files
 
 ## Modular code {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
 
+<br>
+
 ::: columns
 ::: {.column width="50%"}
 -   Created "smaller" functions for each step
@@ -321,6 +311,8 @@ DeleteForecastFiles <- T #Remove extra files
 :::
 
 ## Step 05: Produce model diagnostics reports {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+<br>
 
 -   `r4ss::SS_plots()`
 
@@ -371,7 +363,11 @@ refpoints.ft <- compose(refpoints.ft, i = 4, j = 1, part = "body",
 
 ## Formatted tables for report {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
 
-![](imgs/ref_table.png){.absolute left="100" top="150" width="600" height="400"}
+<br>
+
+![](imgs/ref_table_xls.PNG){.absolute top="150" left="50" width="450"}
+
+![](imgs/ref_table.png){.absolute .fragment right="30" top="150" width="450" height="400"}
 
 ## Lessons learned in our process {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
 
