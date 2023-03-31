@@ -1,0 +1,28 @@
+/*-- scss:defaults --*/
+
+// fonts
+// importing a font downloaded onto my local machine to use
+@font-face {
+  font-family: 'NeueHaasDisplay';
+  src: 
+  url(./fonts/NeueHaasDisplayBold.ttf) format('truetype'), //I extracted the files in the downloaded zip font folder to the 
+  url(./fonts/NeueHaasDisplayMediu.ttf) format('trutype'); //collaborative_workflow_sap/presentation_files/libs/revealjs/dis/theme/fonts folder
+}
+
+$font-family-sans-serif: NeueHaasDisplayMediu, sans-serif, !default;
+$presentation-heading-font: NeueHaasDisplayBold, sans-serif, !default; // use bold version of font for header
+
+$body-bg: #ffffff !default;
+$body-color: #404040 !default; //404040
+$link-color: #86a5ba;
+
+// creating a custom background with the sidebar png file. 
+//currently it is showing 2 images on top of each other, need to figure out why it is doing that
+//the custom background in called .test-background so to apply it to a slide beside the slide title, add {.test-background}
+.test-background {
+  background-color:#ffffff; 
+  background-image:url(./imgs/sidebar_midnights.png);
+  background-size:contain;
+  background-repeat:no-repeat;
+  //background-position:left;
+}

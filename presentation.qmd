@@ -1,0 +1,400 @@
+---
+title: "Collaborative Workflow for SAP"
+title-slide-attributes: 
+  data-background-image: imgs/midnights.png
+  data-background-size: cover
+  data-background-opacity: "0.7"
+format: 
+  revealjs:
+    theme: custom.scss
+    smaller: true
+    self-contained: true
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+## When you think workflow {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+<br>
+
+::: columns
+::: {.column width="40%"}
+Workflow includes:
+
+-   Editor you use to write code
+-   Name of your home directory
+-   Git client you use
+:::
+
+::: {.column width="40%"}
+Products include:
+
+-   Raw data
+-   Packages used for analysis
+-   Functions you wrote
+-   Figures and code used to make those figures
+-   Code someone needs to run to reproduce your results
+:::
+:::
+
+<br>
+
+<br>
+
+**Don't hard code anything about workflow into products**
+
+## Openness as a spectrum {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+<br>
+
+-   Varying degrees of openness
+
+-   Practice peer-review
+
+-   It's okay to share imperfect code
+
+![](imgs/openness.png){.absolute bottom="20"}
+
+## Tools for Openness {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+<br>
+
+-   Use the tools we have to make your work as open as possible
+
+-   Google Drive - good for sharing data among collaborators
+
+    -   Use R code to pull directly from Google drive into R or onto personal computer
+
+-   Github repositories - can keep private until published
+
+-   Open science community
+
+    -   Openscapes training
+
+    -   NMFS R User Group
+
+## I don't know about you but I'm feeling automated workflows {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+<br>
+
+-   Save time and energy
+
+    -   Can put your energy towards developing models and not the tedious details
+
+-   Make things uniform
+
+-   Makes onboarding easier
+
+-   Help future us
+
+-   Helps you avoid mistakes and easier to fix them
+
+<br> <br> **Automate as much as possible!**
+
+## Why SAP should adopt an open and automated workflow {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+<br>
+
+-   Anyone can download a repository and reproduce our results
+
+-   Makes it easier during WPSAR reviews to run reviewer requests
+
+-   Easier onboarding when joining new projects
+
+-   Helps share the responsibility among the team
+
+-   Share knowledge within the group
+
+## Example: American Samoa Bottomfish Assessment {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+<br>
+
+-   Raw data
+
+-   Processed data
+
+-   Model inputs
+
+-   Code
+
+-   Summary reports
+
+-   Figures and tables
+
+-   Github repository
+
+## Step 01: Retrieve raw data {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+<br>
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-overflow: scroll
+#| code-line-numbers: 6-10|22-29
+
+library(googledrive)
+library(googlesheets4)
+
+########## DOWNLOAD DATA FROM GOOGLE DRIVE ###############
+# Check latest data from Google Drive but only download if its more recent than on local repo
+a <- drive_reveal(
+  drive_ls(
+  path="https://drive.google.com/drive/u/1/folders/1pnH38cupmDU4O_KkKDhYWee_p4sTSD6u",
+  pattern="Data"),
+  what = "modified_time")
+a <- arrange(a, by = desc(modified_time))[1,] # Select most recent "Data" zip file
+
+if(dir.exists(file.path(here(..=1),"Data"))){
+         Date.CurrentFolder <- as_datetime(
+           file.info(paste0(file.path(here(..=1)),"/Data"))$mtime)
+} else { 
+  Date.CurrentFolder <- "1900-01-01 01:01:01 UTC" 
+  }
+  
+Date.GoogleFolder <- as_datetime(map_chr(a$drive_resource, "modifiedTime"))
+
+if(Date.CurrentFolder<Date.GoogleFolder){
+    drive_download(file=a$id, 
+                   overwrite = TRUE, 
+                   path = file.path(here(..=1),a$name))
+    
+    unzip(file.path(here(..=1),a$name),
+          exdir=here(..=1))
+    }          
+```
+
+## Step 02: Process data {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+<br>
+
+```{r}
+#| echo: true
+#| eval: false
+
+########## PROCESS CATCH, CPUE, AND SIZE DATA ################
+set.seed(123) 
+source(paste0(here(..=1),"/Scripts/01_Data scripts/01_CPUE_BBS_InitPrep.r"));   rm(list=ls())
+source(paste0(here(..=1),"/Scripts/01_Data scripts/02_CPUE_BBS_PropTable.r"));  rm(list=ls()) 
+source(paste0(here(..=1),"/Scripts/01_Data scripts/03a_CPUE_BBS_Wind.r"));      rm(list=ls())
+source(paste0(here(..=1),"/Scripts/01_Data scripts/03b_CPUE_BBS_PCA.r"));       rm(list=ls()) 
+source(paste0(here(..=1),"/Scripts/01_Data scripts/04_CPUE_BBS_FinalPrep.r"));  rm(list=ls())
+source(paste0(here(..=1),"/Scripts/01_Data scripts/06_CATCH_BBS_FinalPrep.r")); rm(list=ls()) 
+set.seed(123)
+source(paste0(here(..=1),"/Scripts/01_Data scripts/07_CATCH_SBS_PropTable.r")); rm(list=ls()) 
+source(paste0(here(..=1),"/Scripts/01_Data scripts/08_CATCH_SBS_FinalPrep.r")); rm(list=ls())
+source(paste0(here(..=1),"/Scripts/01_Data scripts/09_CATCH_Final.r"));         rm(list=ls())
+source(paste0(here(..=1),"/Scripts/01_Data scripts/10_SIZE.r"));                rm(list=ls()) 
+
+################ RUN CPUE STANDARDIZATION############################
+# Run CPUE standardization and export indices for input into SS
+source(paste0(here(..=1),"/Scripts/01_Data scripts/05_CPUE_BBS_Standardize_Function3.r"))
+source(paste0(here(..=1),"/Scripts/01_Data scripts/05_CPUE_BBS_Standardize_Function2.r"))
+
+# Run CPUE standardization for all species, areas combined in a loop
+root_dir <- root_dir <- this.path::here(.. = 1) 
+Species.List <- c("APRU","APVI","CALU","ETCO","LERU","LUKA","PRFL","PRZO","VALO")
+for(i in 1:length(Species.List)){
+    Standardize_CPUE3(Sp=Species.List[i],Interaction=T,minYr=1988,maxYr=2015)
+}
+
+
+```
+
+## Step 03: Set input arguments {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+<br>
+
+::: columns
+::: {.column width="50%"}
+Arguments we rarely changed
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-overflow: wrap
+Lt     <-vector("list",9) # Species options
+
+Lt[[1]]<-list("APRU",            #Name
+              "SW_Then",         #M       
+              "SW_BBS_BIOS",     #Growth
+              "Kamikawa",        #Length-Weight
+              "SW_BBS_BIOS",     #Maturity
+              F,                 #Use InitF?
+              c(0.5,1.6),        #Range of R0 prof.
+              0.29,              #Btarg. value
+              T,                 #Include superyears?
+              list(c(2019,2020)),#Blocks of superyears
+              c(2.5,5.5,0.2))    #Proj catch range
+```
+:::
+
+::: {.column width="50%"}
+Arguments we changed frequently
+
+```{r}
+#| echo: true
+#| eval: false
+#| code-overflow: wrap
+DirName    <- "65_Base" # Name of directory
+runmodels  <- T   # Run ss.exe
+printreport<- T   # Run ss_diags report
+Create_species_report_figs <- F # Produce formatted 
+                                #figures and tables 
+                                #word document
+N_boot     <- 0   # Bootstrap on/off
+N_foreyrs  <- 0   # Nyears for forecast
+RD         <- F   # Run diagnostics
+ProfRes    <- .1 # R0 profile resolution
+profile    <- "SR_LN(R0)" # Parameter to profile 
+Begin      <- c(1967,1986)[1] #Model start year
+DeleteForecastFiles <- T #Remove extra files
+
+
+```
+:::
+:::
+
+## Step 04: Build models and run {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+<br>
+
+-   The core function is `Build_All_SS()`
+
+-   Wrapper function for modular functions:
+
+    -   `Build_Data()`
+
+    -   `Build_Control()`
+
+    -   `Build_Starter()`
+
+    -   `Build_Forecast()`
+
+-   Incorporate parameter information stored in Google Sheets
+
+    ```{r}
+    #| echo: true
+    #| eval: false
+    #| code-line-numbers: "|2-5|8-11"
+
+     if(readGoogle == T){
+          ctl.params <- read_sheet("1XvzGtPls8hnHHGk7nmVwhggom4Y1Zp-gOHNw4ncUs8E", 
+                               sheet=species)
+          ctl.inputs <- read_sheet("11lPJV7Ub9eoGbYjoPNRpcpeWUM5RYl4W65rHHFcQ9fQ",
+                                   sheet=scenario)
+      
+      }else{
+        ctl.inputs <- readxl::read_excel(file.path(root_dir, "Data", "CTL_inputs.xlsx"), 
+                                         sheet=scenario)
+        ctl.params <- readxl::read_excel(file.path(root_dir, "Data", "CTL_parameters.xlsx"), 
+                           sheet=species)
+      }
+
+    ```
+
+## Modular code {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+::: columns
+::: {.column width="50%"}
+-   Created "smaller" functions for each step
+
+-   Used the main function as a wrapper so could run everything from 1 script and easy to turn functions on and off
+
+    -   bootstraps
+
+    -   diagnostics
+
+    -   forecasting
+
+    -   alternate models
+
+    -   summary reports
+
+    -   creating specific plots and tables
+:::
+
+::: {.column width="50%"}
+![](imgs/code_structure.PNG){fig-align="right" width="12.97in"}
+:::
+:::
+
+## Step 05: Produce model diagnostics reports {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+-   `r4ss::SS_plots()`
+
+-   Created a custom [qmd](./imgs/APRU_65_Base_model_diags_report.html){preview-link="true"} with model diagnostic plots and tables
+
+    -   runs test, likelihood profiles, retrospectives, jitters, etc.
+
+-   Created html and pdf versions
+
+    -   only PDFs were synced with the repository
+
+## Step 06: Generate formatted tables and figures for report {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+<br>
+
+Leveraged Quarto document to produce a .docx with figures and tables formatted exactly how we wanted to incorporate them into the report
+
+```{r}
+#| code-overflow: scroll
+#| code-line-numbers: 4-7,11|13-16|18-23
+#| echo: true
+library(openxlsx)
+library(flextable)
+
+set_flextable_defaults(
+  font.size = 11, font.family = "Arial", 
+  border.color = "black", font.color = "black")
+border <- officer::fp_border()
+
+refpoints <- read.xlsx(file.path("./", "scr", "01_tables.xlsx"), 
+                       sheet = "02_RefPoints")
+refpoints.ft <- flextable(refpoints)
+
+refpoints.ft <- set_header_labels(refpoints.ft, REF_POINT = "Reference point", ALL = "Value")
+refpoints.ft <- hline_bottom(refpoints.ft, border = border)
+refpoints.ft <- hline_top(refpoints.ft, border = border, part = "header")
+refpoints.ft <- hline_bottom(refpoints.ft, border = border, part = "header")
+
+refpoints.ft <- compose(refpoints.ft, i = 1, j = 1, part = "body", 
+                        value = as_paragraph(as_i("F"), as_sub("MSY"),
+                                             " (yr", as_sup("-1"), ")"))
+
+refpoints.ft <- compose(refpoints.ft, i = 4, j = 1, part = "body", 
+                        value = as_paragraph(as_i("SSB"), as_sub("MSST")))
+
+
+```
+
+## Formatted tables for report {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+![](imgs/ref_table.png){.absolute left="100" top="150" width="600" height="400"}
+
+## Lessons learned in our process {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+<br>
+
+-   Use packages that work with all platforms of R
+
+-   Make functions flexible enough to give you options but don't worry about coding every single possibility
+
+-   Develop as you go, streamline as you go
+
+-   Make code modular
+
+## Small changes you can implement now {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+<br>
+
+-   More comments, or use software such as Quarto or RMarkdown for literate programming
+
+-   Read other people's code
+
+-   Make sure you are using relative paths and including all the packages you used in that script
+
+-   When naming scripts, give them informative names and try sequencing them
+
+-   Get in the habit of syncing code with repository regularly
