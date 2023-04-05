@@ -8,7 +8,7 @@ format:
   revealjs:
     theme: custom.scss
     smaller: true
-    self-contained: true
+    margin: 0.17
 editor: visual
 editor_options: 
   chunk_output_type: console
@@ -40,13 +40,13 @@ Products include:
 
 <br>
 
-<br>
-
 **Don't hard code anything about workflow into products**
 
 ## Openness as a spectrum {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
 
 <br>
+
+{{< fa quote-left >}} Open Science is the principle and practice of making research products and processes available to all, while respecting diverse cultures, maintaining security and privacy, and fostering collaborations, reproducibility, and equity.
 
 -   Varying degrees of openness
 
@@ -74,7 +74,11 @@ Products include:
 
     -   NMFS R User Group
 
-## I don't know about you but I'm feeling automated workflows {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+    <br>
+
+    {{< fa brands github size=5x >}} {{< fa brands google-drive size=5x >}}
+
+## Benefits of automated workflows {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
 
 <br>
 
@@ -106,11 +110,63 @@ Products include:
 
 -   Share knowledge within the group
 
-## Example: American Samoa Bottomfish Assessment {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+## Challenges of American Samoa Bottomfish Assessment {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+::: columns
+::: {.column .incremental width="50%"}
+**Problems**
+
+-   Develop 9 individual models that have the same structure but different data and parameter values.
+:::
+
+::: {.column .incremental width="50%"}
+**Solutions**
+
+-   Wrote custom functions to build the model input files and include the correct data and parameter values for each species.
+:::
+:::
+
+::: columns
+::: {.column .incremental width="50%"}
+-   Develop models simultaneously and update parameter values without having to upload and download new versions of a spreadsheet.
+:::
+
+::: {.column .incremental width="50%"}
+-   Set up 2 Google Sheets ([inputs](https://docs.google.com/spreadsheets/d/11lPJV7Ub9eoGbYjoPNRpcpeWUM5RYl4W65rHHFcQ9fQ/edit#gid=404015578) and [parameters](https://docs.google.com/spreadsheets/d/1XvzGtPls8hnHHGk7nmVwhggom4Y1Zp-gOHNw4ncUs8E/edit#gid=195137582)) that we could change and pull the information directly into R with real-time updated information.
+:::
+:::
+
+::: columns
+::: {.column .incremental width="50%"}
+-   Share quick summaries of each model version easily with people.
+:::
+
+::: {.column .incremental width="50%"}
+-   Included pdf reports of summary plots and diagnostics for each model version with 4 input files needed to reproduce those plots.
+:::
+:::
+
+## Our Workflow {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
 
 <br>
 
-![](imgs/process_diagram.PNG)
+![](imgs/process_diagram.PNG){fig-align="center" width="15in"}
+
+## Repository Structure {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+![](imgs/github_repo_1.png)
+
+## Repository Structure {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+![](imgs/github_repo_2.png)
+
+## Repository Structure {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+![](imgs/github_repo_3.png)
+
+## Repository Structure {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+![](imgs/github_repo_4.png)
 
 ## Step 01: Retrieve raw data {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
 
@@ -252,13 +308,7 @@ DeleteForecastFiles <- T #Remove extra files
 
 -   Wrapper function for modular functions:
 
-    -   `Build_Data()`
-
-    -   `Build_Control()`
-
-    -   `Build_Starter()`
-
-    -   `Build_Forecast()`
+    -   `Build_Data()` , `Build_Control()` , `Build_Starter()` , `Build_Forecast()`
 
 -   Incorporate parameter information stored in Google Sheets
 
@@ -283,6 +333,7 @@ DeleteForecastFiles <- T #Remove extra files
     ```
 
 ## Modular code {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
 
 <br>
 
@@ -322,18 +373,19 @@ DeleteForecastFiles <- T #Remove extra files
 
 -   Created html and pdf versions
 
-    -   only PDFs were synced with the repository
+    -   PDFs were synced with the repository so anyone could look at the diagnostics for a certain model without cloning the repository onto their computer
 
-## Step 06: Generate formatted tables and figures for report {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+## Step 06: Generate formatted tables and figures {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
 
 <br>
 
-Leveraged Quarto document to produce a .docx with figures and tables formatted exactly how we wanted to incorporate them into the report
+Quarto document produced a .docx with figures and tables formatted for the report
 
 ```{r}
 #| code-overflow: scroll
 #| code-line-numbers: 4-7,11|13-16|18-23
 #| echo: true
+#| eval: false
 library(openxlsx)
 library(flextable)
 
@@ -394,3 +446,25 @@ refpoints.ft <- compose(refpoints.ft, i = 4, j = 1, part = "body",
 -   When naming scripts, give them informative names and try sequencing them
 
 -   Get in the habit of syncing code with repository regularly
+
+## Discussion points {background-color="#ffffff" background-image="imgs/sidebar_midnights.png" background-size="contain" background-repeat="no-repeat" background-position="left"}
+
+<br>
+
+-   Is this system useful for single-species assessments?
+
+    -   I think its useful for any assessment with more than 1 person working on it
+
+-   How can we help each other with setting these systems up?
+
+    -   coworking time in small groups
+
+    -   set up GitHub repository templates for a common set-up
+
+-   How can this be useful for international assessments?
+
+-   What about reference manager software?
+
+-   What are some good tools people use for project management?
+
+    -   GitHub Projects
